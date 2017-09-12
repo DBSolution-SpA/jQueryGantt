@@ -586,6 +586,7 @@ function editResources(){
       <th style="width:100px;">name</th>
       <th style="width:70px;">Role</th>
       <th style="width:30px;">est.wklg.</th>
+      <th style="width:30px;">percent</th>
       <th style="width:30px;" id="addAssig"><span class="teamworkIcon" style="cursor: pointer">+</span></th>
     </tr>
   </table>
@@ -600,10 +601,11 @@ function editResources(){
 
 
 <div class="__template__" type="ASSIGNMENT_ROW"><!--
-  <tr taskId="(#=obj.task.id#)" assId="(#=obj.assig.id#)" class="assigEditRow" >
+  <tr taskId="(#=obj.task.id#)" assId="(#=obj.assig.id#)" percent="(#=obj.assig.percent#)" class="assigEditRow" >
     <td ><select name="resourceId"  class="formElements" (#=obj.assig.id.indexOf("tmp_")==0?"":"disabled"#) ></select></td>
     <td ><select type="select" name="roleId"  class="formElements"></select></td>
     <td ><input type="text" name="effort" value="(#=getMillisInHoursMinutes(obj.assig.effort)#)" size="5" class="formElements"></td>
+    <td ><select type="select" name="percent"  class="formElements"></select></td>
     <td align="center"><span class="teamworkIcon delAssig del" style="cursor: pointer">d</span></td>
   </tr>
   --></div>
@@ -661,6 +663,16 @@ function editResources(){
       if(taskAssig.assig.roleId == role.id)
         optr.attr("selected", "true");
       roleEl.append(optr);
+    }
+    var percentEl = assigTr.find("[name=percent]");
+    for (var i=0; i<=100; i=i+5){
+        if (!taskAssig.assig.percent)
+            taskAssig.assig.percent = 100;
+        var optr = $("<option>");
+        optr.val(i).html(i + '%');
+        if(taskAssig.assig.percent == i)
+            optr.attr("selected", "true");
+        percentEl.append(optr);
     }
 
     if(taskAssig.task.master.permissions.canWrite && taskAssig.task.canWrite){

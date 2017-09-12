@@ -652,6 +652,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
         var resName = trAss.find("[name=resourceId_txt]").val(); // from smartcombo text input part
         var roleId = trAss.find("[name=roleId]").val();
         var effort = millisFromString(trAss.find("[name=effort]").val(),true);
+        var percent = trAss.find("[name=percent]").val();
 
         //check if the selected resource exists in ganttMaster.resources
         var res= self.master.getOrCreateResource(resId,resName);
@@ -666,6 +667,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
           var ass = task.assigs[i];
 
           if (assId == ass.id) {
+            ass.percent = percent;
             ass.effort = effort;
             ass.roleId = roleId;
             ass.resourceId = res.id;
@@ -674,6 +676,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
             break;
 
           } else if (roleId == ass.roleId && res.id == ass.resourceId) {
+            ass.percent = percent;
             ass.effort = effort;
             ass.touched = true;
             found = true;
@@ -685,7 +688,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
         if (!found && resId && roleId) { //insert
           cnt++;
           //console.debug("adding assig row:", assId,resId,resName,roleId,effort)
-          var ass = task.createAssignment("tmp_" + new Date().getTime()+"_"+cnt, resId, roleId, effort);
+          var ass = task.createAssignment("tmp_" + new Date().getTime()+"_"+cnt, resId, roleId, effort, percent);
           ass.touched = true;
         }
 
