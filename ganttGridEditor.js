@@ -688,7 +688,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
         if (!found && resId && roleId) { //insert
           cnt++;
           //console.debug("adding assig row:", assId,resId,resName,roleId,effort)
-          var ass = task.createAssignment("tmp_" + new Date().getTime()+"_"+cnt, resId, roleId, effort, percent);
+          var ass = task.createAssignment("tmp_" + new Date().getTime()+"_"+cnt, resId, roleId, effort, percent, 0);
           ass.touched = true;
         }
 

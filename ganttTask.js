@@ -94,8 +94,8 @@ Task.prototype.getAssigsString = function () {
   return ret;
 };
 
-Task.prototype.createAssignment = function (id, resourceId, roleId, effort, percent) {
-  var assig = new Assignment(id, resourceId, roleId, effort, percent);
+Task.prototype.createAssignment = function (id, resourceId, roleId, effort, percent, worked) {
+  var assig = new Assignment(id, resourceId, roleId, effort, percent, worked);
   this.assigs.push(assig);
   return assig;
 };
@@ -764,6 +764,18 @@ Task.prototype.getInferiorTasks = function () {
 };
 
 Task.prototype.deleteTask = function () {
+
+  for (var i = 0; i<this.assigs.length; i++){
+    if (this.assigs[i].worked > 0){
+
+        var error = "No se puede borrar la " + (!this.master.currentTask?'sub-':'') + "tarea '" + this.name +
+            "' porque existen horas declaradas en una o varias de sus asignaciones.\n\n" +
+            "Por Favor, eliminar la o las asignaciones primero.";
+
+        this.master.setErrorOnTransaction(error, this);
+    }
+  }
+
   //console.debug("deleteTask",this.name,this.master.deletedTaskIds)
   //if is the current one remove it
   if (this.master.currentTask && this.master.currentTask.id==this.id)
@@ -1064,12 +1076,13 @@ function Link(taskFrom, taskTo, lagInWorkingDays) {
 
 
 //<%------------------------------------------------------------------------  ASSIGNMENT ---------------------------------------------------------------%>
-function Assignment(id, resourceId, roleId, effort, percent) {
+function Assignment(id, resourceId, roleId, effort, percent, worked) {
   this.id = id;
   this.resourceId = resourceId;
   this.roleId = roleId;
   this.effort = effort;
   this.percent = percent;
+  this.worked = worked;
 }
 
 
