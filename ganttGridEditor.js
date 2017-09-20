@@ -619,7 +619,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
     taskEditor.find("#addAssig").click(function () {
       cnt++;
       var assigsTable = taskEditor.find("#assigsTable");
-      var assigRow = $.JST.createFromTemplate({task: task, assig: {id: "tmp_" + new Date().getTime()+"_"+cnt, start: task.start, end: task.end-86399999 }}, "ASSIGNMENT_ROW");
+      var assigRow = $.JST.createFromTemplate({task: task, assig: {id: "tmp_" + new Date().getTime()+"_"+cnt, start: task.getMinAssignTS(), end: task.getMaxAssignTS() }}, "ASSIGNMENT_ROW");
       assigsTable.append(assigRow);
 
       $('#workSpace').trigger('showAssig.gantt', assigsTable);
