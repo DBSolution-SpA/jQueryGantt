@@ -94,12 +94,18 @@ Task.prototype.getAssigsString = function () {
   return ret;
 };
 
-Task.prototype.createAssignment = function (id, resourceId, roleId, effort, percent, worked) {
-  var assig = new Assignment(id, resourceId, roleId, effort, percent, worked);
+Task.prototype.createAssignment = function (id, resourceId, roleId, effort, start, end, percent, worked) {
+  var assig = new Assignment(id, resourceId, roleId, effort, start, end, percent, worked);
   this.assigs.push(assig);
   return assig;
 };
 
+Task.prototype.getMinAssignTS = function(){
+  return parseInt(this.start/86400000)*86400000;
+}
+Task.prototype.getMaxAssignTS = function(){
+    return parseInt((this.end-86399999)/86400000)*86400000;
+}
 
 //<%---------- SET PERIOD ---------------------- --%>
 Task.prototype.setPeriod = function (start, end) {
@@ -119,7 +125,6 @@ Task.prototype.setPeriod = function (start, end) {
     end:      this.end,
     duration: this.duration
   };
-
 
   //compute legal start/end //todo mossa qui R&S 30/3/2016 perchè altrimenti il calcolo della durata, che è stato modificato sommando giorni, sbaglia
   start = computeStart(start);
@@ -172,6 +177,19 @@ Task.prototype.setPeriod = function (start, end) {
   }
 
   this.duration = recomputeDuration(this.start, this.end);
+    
+  // se ajustan las fechas de asignaciones en el caso en que estas se salen del rango
+  for (var i=0; i<this.assigs.length; i++){
+    if (this.assigs[i].start < this.getMinAssignTS()){
+      this.assigs[i].start = this.getMinAssignTS();
+    }
+    if (this.assigs[i].end > this.getMaxAssignTS()){
+      this.assigs[i].end = this.getMaxAssignTS();
+    }
+    if (this.assigs[i].end < this.assigs[i].start){
+      this.assigs[i].end = this.assigs[i].start;
+    }
+  }
 
   //profilerSetPer.stop();
 
@@ -1076,11 +1094,13 @@ function Link(taskFrom, taskTo, lagInWorkingDays) {
 
 
 //<%------------------------------------------------------------------------  ASSIGNMENT ---------------------------------------------------------------%>
-function Assignment(id, resourceId, roleId, effort, percent, worked) {
+function Assignment(id, resourceId, roleId, effort, start, end, percent, worked) {
   this.id = id;
   this.resourceId = resourceId;
   this.roleId = roleId;
   this.effort = effort;
+  this.start = start;
+  this.end = end;
   this.percent = percent;
   this.worked = worked;
 }

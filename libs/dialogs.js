@@ -131,7 +131,7 @@ function submitInBlack(formId, actionHref, w, h) {
 
 var __popups = [];
 function createModalPopup(width, height, onCloseCallBack, cssClass, element, popupOpener) {
-  //console.debug("createModalPopup");
+  console.debug("createModalPopup");
 
 
   if (typeof(disableUploadize)=="function")
@@ -213,9 +213,11 @@ function createModalPopup(width, height, onCloseCallBack, cssClass, element, pop
 		if (isInIframe) {
 			internalDiv.css({marginTop: -50 });
 			el.show();
+			$('#workSpace').trigger('showBG.gantt', internalDiv);
 			internalDiv.animate({marginTop: 0}, (time/2), callback);
 		} else {
 			internalDiv.css({opacity: 0, top: -50}).show();
+            $('#workSpace').trigger('showBG.gantt', internalDiv);
 			el.fadeIn(time, function () {
 				internalDiv.animate({top: 0, opacity: 1}, time/3, callback);
 			});

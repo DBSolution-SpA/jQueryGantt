@@ -619,10 +619,13 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
     taskEditor.find("#addAssig").click(function () {
       cnt++;
       var assigsTable = taskEditor.find("#assigsTable");
-      var assigRow = $.JST.createFromTemplate({task: task, assig: {id: "tmp_" + new Date().getTime()+"_"+cnt}}, "ASSIGNMENT_ROW");
+      var assigRow = $.JST.createFromTemplate({task: task, assig: {id: "tmp_" + new Date().getTime()+"_"+cnt, start: task.start, end: task.end-86399999 }}, "ASSIGNMENT_ROW");
       assigsTable.append(assigRow);
+
+      $('#workSpace').trigger('showAssig.gantt', assigsTable);
       $("#bwinPopupd").scrollTop(10000);
-    }).click();
+
+    });
 
     //save task
     taskEditor.bind("saveFullEditor.gantt",function () {
@@ -653,6 +656,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
         var roleId = trAss.find("[name=roleId]").val();
         var effort = millisFromString(trAss.find("[name=effort]").val(),true);
         var percent = trAss.find("[name=percent]").val();
+        var dates = JSON.parse("[" + trAss.find("+tr [name=dates]").val() + "]");
 
         //check if the selected resource exists in ganttMaster.resources
         var res= self.master.getOrCreateResource(resId,resName);
@@ -667,6 +671,8 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
           var ass = task.assigs[i];
 
           if (assId == ass.id) {
+            ass.start = dates[0];
+            ass.end = dates[1];
             ass.percent = percent;
             ass.effort = effort;
             ass.roleId = roleId;
@@ -676,6 +682,8 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
             break;
 
           } else if (roleId == ass.roleId && res.id == ass.resourceId) {
+            ass.start = dates[0];
+            ass.end = dates[1];
             ass.percent = percent;
             ass.effort = effort;
             ass.touched = true;
@@ -688,7 +696,7 @@ GridEditor.prototype.openFullEditor = function (task, editOnlyAssig) {
         if (!found && resId && roleId) { //insert
           cnt++;
           //console.debug("adding assig row:", assId,resId,resName,roleId,effort)
-          var ass = task.createAssignment("tmp_" + new Date().getTime()+"_"+cnt, resId, roleId, effort, percent, 0);
+          var ass = task.createAssignment("tmp_" + new Date().getTime()+"_"+cnt, resId, roleId, effort, dates[0], dates[1], percent, 0);
           ass.touched = true;
         }
 
