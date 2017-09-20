@@ -106,6 +106,20 @@ Task.prototype.getMinAssignTS = function(){
 Task.prototype.getMaxAssignTS = function(){
     return parseInt((this.end-86399999)/86400000)*86400000;
 }
+Task.prototype.adjustAssigns = function(){
+    // se ajustan las fechas de asignaciones en el caso en que estas se salen del rango
+    for (var i=0; i<this.assigs.length; i++){
+        if (this.assigs[i].start < this.getMinAssignTS()){
+            this.assigs[i].start = this.getMinAssignTS();
+        }
+        if (this.assigs[i].end > this.getMaxAssignTS()){
+            this.assigs[i].end = this.getMaxAssignTS();
+        }
+        if (this.assigs[i].end < this.assigs[i].start){
+            this.assigs[i].end = this.assigs[i].start;
+        }
+    }
+}
 
 //<%---------- SET PERIOD ---------------------- --%>
 Task.prototype.setPeriod = function (start, end) {
@@ -177,19 +191,8 @@ Task.prototype.setPeriod = function (start, end) {
   }
 
   this.duration = recomputeDuration(this.start, this.end);
-    
-  // se ajustan las fechas de asignaciones en el caso en que estas se salen del rango
-  for (var i=0; i<this.assigs.length; i++){
-    if (this.assigs[i].start < this.getMinAssignTS()){
-      this.assigs[i].start = this.getMinAssignTS();
-    }
-    if (this.assigs[i].end > this.getMaxAssignTS()){
-      this.assigs[i].end = this.getMaxAssignTS();
-    }
-    if (this.assigs[i].end < this.assigs[i].start){
-      this.assigs[i].end = this.assigs[i].start;
-    }
-  }
+
+  this.adjustAssigns();
 
   //profilerSetPer.stop();
 
@@ -332,6 +335,8 @@ Task.prototype.moveTo = function (start, ignoreMilestones) {
     this.start = start;
     this.end = end;
     //profiler.stop();
+
+    this.adjustAssigns();
 
     //check global boundaries
     if (this.start < this.master.minEditableDate || this.end > this.master.maxEditableDate) {
