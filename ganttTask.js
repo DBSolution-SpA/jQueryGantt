@@ -101,10 +101,10 @@ Task.prototype.createAssignment = function (id, resourceId, roleId, effort, star
 };
 
 Task.prototype.getMinAssignTS = function(){
-  return parseInt(this.start/86400000)*86400000;
+  return this.start;
 }
 Task.prototype.getMaxAssignTS = function(){
-    return parseInt((this.end-86399999)/86400000)*86400000;
+    return this.end-86400000+1;
 }
 Task.prototype.adjustAssigns = function(){
     // se ajustan las fechas de asignaciones en el caso en que estas se salen del rango
